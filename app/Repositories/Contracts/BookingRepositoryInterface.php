@@ -6,7 +6,7 @@ interface BookingRepositoryInterface
 {
     public function createBooking(array $data);
 
-    public function findTrxIdAndPhoneNumber($bookingTrxId, $phoneNumber);
+    public function findTrxIdAndPhoneNumber($bookingTrxId, $phone);
 
     public function saveToSession(array $data);
     public function updateSessionData(array $data);

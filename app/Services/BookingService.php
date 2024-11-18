@@ -22,7 +22,8 @@ class BookingService
         $this->workshopRepository = $workshopRepository;
     }
 
-    public function storeBooking(array $validatedData) {
+    public function storeBooking(array $validatedData)
+    {
         $existingData = $this->bookingRepository->getOrderDataFromSession();
 
         $updatedData = array_merge($existingData, $validatedData);
@@ -32,11 +33,13 @@ class BookingService
         return $updatedData;
     }
 
-    public function isBookingSessionAvailable() {
+    public function isBookingSessionAvailable()
+    {
         return $this->bookingRepository->getOrderDataFromSession() !== null;
     }
 
-    public function getBookingDetails(){
+    public function getBookingDetails()
+    {
         $orderData = $this->bookingRepository->getOrderDataFromSession();
 
         if (empty($orderData)) {
@@ -60,10 +63,11 @@ class BookingService
         return compact('orderData', 'workshop');
     }
 
-    public function finalizeBookingAndPayment(array $paymentData) {
+    public function finalizeBookingAndPayment(array $paymentData)
+    {
         $orderData = $this->bookingRepository->getOrderDataFromSession();
 
-        if (!$orderData){
+        if (!$orderData) {
             throw new \Exception('Booking data is missing from session.');
         }
 
@@ -73,7 +77,7 @@ class BookingService
             throw new \Exception('Total amount is missing from order data.');
         }
 
-        if (!isset($paymentData['proof'])) {
+        if (isset($paymentData['proof'])) {
             $proofPath = $paymentData['proof']->store('proofs', 'public');
         }
 
@@ -95,7 +99,7 @@ class BookingService
                 'booking_trx_id' => BookingTransaction::generateUniqueTrxId(),
             ]);
 
-            foreach($orderData['participants'] as $participant) {
+            foreach ($orderData['participants'] as $participant) {
                 WorkshopParticipant::create([
                     'name' => $participant['name'],
                     'occupation' => $participant['occupation'],
@@ -117,10 +121,11 @@ class BookingService
         }
     }
 
-    public function getMyBookingDetails(array $validated) {
+    public function getMyBookingDetails(array $validated)
+    {
         return $this->bookingRepository->findTrxIdAndPhoneNumber(
             $validated['booking_trx_id'],
-            $validated['phone_number']
+            $validated['phone']
         );
     }
 

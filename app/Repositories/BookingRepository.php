@@ -8,32 +8,38 @@ use Illuminate\Support\Facades\Session;
 
 class BookingRepository implements BookingRepositoryInterface
 {
-    public function createBooking(array $data) {
+    public function createBooking(array $data)
+    {
         return BookingTransaction::create($data);
     }
 
-    public function findTrxIdAndPhoneNumber($bookingTrxId, $phoneNumber) {
+    public function findTrxIdAndPhoneNumber($bookingTrxId, $phone)
+    {
         return BookingTransaction
             ::where('booking_trx_id', $bookingTrxId)
-            ->where('phone_number', $phoneNumber)
+            ->where('phone', $phone)
             ->first();
     }
 
-    public function saveToSession(array $data) {
+    public function saveToSession(array $data)
+    {
         Session::put('orderData', $data);
     }
 
-    public function getOrderDataFromSession(){
+    public function getOrderDataFromSession()
+    {
         return Session::get('orderData', []);
     }
 
-    public function updateSessionData(array $data){
+    public function updateSessionData(array $data)
+    {
         $orderData = session('orderData', []);
         $orderData = array_merge($orderData, $data);
         session(['orderData' => $orderData]);
     }
 
-    public function clearSession(){
+    public function clearSession()
+    {
         Session::forget('orderData');
     }
 }

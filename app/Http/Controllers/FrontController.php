@@ -16,16 +16,19 @@ class FrontController extends Controller
         $this->frontService = $frontService;
     }
 
-    public function index() {
+    public function index()
+    {
         $data = $this->frontService->getFrontPageData();
         return view('front.index', $data);
     }
 
-    public function details(Workshop $workshop) {
+    public function details(Workshop $workshop)
+    {
         return view('front.details', compact('workshop'));
     }
 
-    public function category(Category $category) {
+    public function category(Category $category)
+    {
         return view('front.category', compact('category'));
     }
 }

@@ -15,15 +15,18 @@ class BookingController extends Controller
 {
     protected $bookingService;
 
-    public function __construct(BookingService $bookingService) {
+    public function __construct(BookingService $bookingService)
+    {
         $this->bookingService = $bookingService;
     }
 
-    public function booking(Workshop $workshop) {
+    public function booking(Workshop $workshop)
+    {
         return view('booking.booking', compact('workshop'));
     }
 
-    public function bookingStore(StoreBookingRequest $request, Workshop $workshop) {
+    public function bookingStore(StoreBookingRequest $request, Workshop $workshop)
+    {
         $validated = $request->validated();
         $validated['workshop_id'] = $workshop->id;
 
@@ -35,7 +38,8 @@ class BookingController extends Controller
         }
     }
 
-    public function payment() {
+    public function payment()
+    {
         if (!$this->bookingService->isBookingSessionAvailable()) {
             return redirect()->route('front.index');
         }
@@ -49,33 +53,43 @@ class BookingController extends Controller
         return view('booking.payment', $data);
     }
 
-    public function paymentStore(StorePaymentRequest $request) {
+    public function paymentStore(StorePaymentRequest $request)
+    {
         $validated = $request->validated();
 
         try {
             $bookingTransactionId = $this->bookingService->finalizeBookingAndPayment($validated);
             return redirect()->route('front.booking_finished', $bookingTransactionId);
         } catch (\Exception $e) {
-            Log::error('Payment storage failed: '. $e->getMessage());
-            return redirect()->back()->withErrors(['error' => 'Unable to store payment details. Please try again. '. $e->getMessage()]);
+            Log::error('Payment storage failed: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Unable to store payment details. Please try again. ' . $e->getMessage()]);
         }
     }
 
-    public function bookingFinished(BookingTransaction $bookingTransaction) {
-        return view('booking.finished', compact('bookingTransaction'));
+    public function bookingFinished(BookingTransaction $bookingTransaction)
+    {
+        return view('booking.booking_finished', compact('bookingTransaction'));
     }
 
-    public function checkBooking() {
+    public function checkBooking()
+    {
         return view('booking.my_booking');
     }
 
-    public function checkBookingDetails(StoreCheckBookingRequest $request) {
+    public function checkBookingDetails(StoreCheckBookingRequest $request)
+    {
         $validated = $request->validated();
 
         $myBookingDetails = $this->bookingService->getMyBookingDetails($validated);
 
-        if($myBookingDetails) {
-            return view('booking.my_booking_details', compact('myBookingDetails'));
+        if ($myBookingDetails) {
+
+            $subTotalAmount = $myBookingDetails->workshop->price * $myBookingDetails->quantity;
+
+            $taxRate = 0.11;
+            $totalTax = $subTotalAmount * $taxRate;
+
+            return view('booking.my_booking_details', compact('myBookingDetails', 'totalTax', 'subTotalAmount'));
         }
 
         return redirect()->route('front.check_booking')->withErrors(['error' => 'Transaction not found.']);
